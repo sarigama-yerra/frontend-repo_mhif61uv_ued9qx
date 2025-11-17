@@ -23,6 +23,12 @@ export default function Hero() {
   const tiltX = useTransform(smoothY, [-1, 1], [6, -6])
   const tiltY = useTransform(smoothX, [-1, 1], [-6, 6])
 
+  // Stronger tilt for the featured card
+  const cardTiltX = useTransform(smoothY, [-1, 1], [12, -12])
+  const cardTiltY = useTransform(smoothX, [-1, 1], [-12, 12])
+  const cardShiftX = useTransform(smoothX, [-1, 1], [10, -10])
+  const cardShiftY = useTransform(smoothY, [-1, 1], [8, -8])
+
   useEffect(() => {
     // Initialize to center
     mouseX.set(0)
@@ -132,6 +138,59 @@ export default function Hero() {
           <motion.p variants={itemUp} className="text-lg text-gray-700 max-w-2xl">
             A premium, glass-morphic card built for modern life. Earn rewards on every spend, enjoy airport lounge access, and get concierge support 24/7.
           </motion.p>
+
+          {/* Featured 3D-looking card to showcase the original design */}
+          <motion.div
+            variants={itemUp}
+            className="relative mt-2 mb-2"
+            style={{ perspective: 1200 }}
+          >
+            <motion.div
+              style={{ rotateX: cardTiltX, rotateY: cardTiltY, x: cardShiftX, y: cardShiftY, transformStyle: 'preserve-3d' }}
+              className="relative mx-auto w-[300px] sm:w-[360px] h-[180px] sm:h-[216px] rounded-3xl p-5 sm:p-6 shadow-2xl"
+            >
+              {/* Card body */}
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-neutral-900 via-zinc-800 to-neutral-900" />
+              {/* Subtle glass highlights */}
+              <div className="absolute inset-0 rounded-3xl bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.12),transparent_45%),radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.07),transparent_55%)]" />
+              {/* Border glow */}
+              <div className="absolute inset-0 rounded-3xl ring-1 ring-white/15" />
+
+              {/* Shine sweep */}
+              <motion.div
+                className="pointer-events-none absolute -inset-1 rounded-[1.75rem]"
+                initial={{ opacity: 0.4, x: -200 }}
+                animate={{ x: 300 }}
+                transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}
+                style={{ background: 'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.12) 45%, rgba(255,255,255,0.06) 55%, transparent 70%)' }}
+              />
+
+              {/* Content */}
+              <div className="relative h-full w-full flex flex-col justify-between text-white">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-semibold tracking-wider uppercase text-amber-300">Tiger</div>
+                  <div className="h-6 w-9 rounded-md bg-gradient-to-br from-amber-400 to-red-400 opacity-90" />
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-[11px] opacity-70">
+                    <div className="h-4 w-5 rounded-sm bg-gradient-to-br from-zinc-300 to-white opacity-90 mr-1" />
+                    <span>VIRTUAL • CARD</span>
+                  </div>
+                  <div className="font-[600] tracking-[0.25em] text-lg sm:text-xl">5240  1930  4872  1029</div>
+                  <div className="flex items-center justify-between text-[11px] opacity-80">
+                    <span>VALID THRU 12/28</span>
+                    <span className="tracking-widest">VISA</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="font-medium tracking-widest">ALEXANDER TIGER</span>
+                  <div className="h-6 w-10 rounded bg-gradient-to-br from-sky-400 to-indigo-500 opacity-80" />
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
 
           <motion.div variants={itemUp} className="flex flex-col sm:flex-row gap-3 pt-2">
             <motion.a
