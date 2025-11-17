@@ -1,6 +1,6 @@
 import Spline from '@splinetool/react-spline'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function Hero() {
   // Motion values for interactive parallax
@@ -28,6 +28,9 @@ export default function Hero() {
   const cardTiltY = useTransform(smoothX, [-1, 1], [-12, 12])
   const cardShiftX = useTransform(smoothX, [-1, 1], [10, -10])
   const cardShiftY = useTransform(smoothY, [-1, 1], [8, -8])
+
+  // Flip state for the card (also toggled on tap for mobile)
+  const [isFlipped, setIsFlipped] = useState(false)
 
   useEffect(() => {
     // Initialize to center
@@ -72,7 +75,7 @@ export default function Hero() {
 
       {/* Depth Layer: Soft gradient orbs (far back) */}
       <motion.div className="absolute inset-0 -z-40 pointer-events-none" style={{ x: bgX, y: bgY }}>
-        <div className="absolute -top-40 -left-32 h-[36rem] w-[36rem] bg-gradient-to-br from-amber-400/35 via-orange-500/20 to-fuchsia-500/20 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -left-32 h:[36rem] w-[36rem] bg-gradient-to-br from-amber-400/35 via-orange-500/20 to-fuchsia-500/20 rounded-full blur-3xl" />
         <div className="absolute -bottom-40 -right-24 h-[40rem] w-[40rem] bg-gradient-to-br from-indigo-500/25 via-purple-500/25 to-pink-500/20 rounded-full blur-3xl" />
       </motion.div>
 
@@ -139,56 +142,106 @@ export default function Hero() {
             A premium, glass-morphic card built for modern life. Earn rewards on every spend, enjoy airport lounge access, and get concierge support 24/7.
           </motion.p>
 
-          {/* Featured 3D-looking card to showcase the original design */}
+          {/* Featured 3D-looking vertical card with flip interaction */}
           <motion.div
             variants={itemUp}
             className="relative mt-2 mb-2"
-            style={{ perspective: 1200 }}
+            style={{ perspective: 1400 }}
           >
             <motion.div
-              style={{ rotateX: cardTiltX, rotateY: cardTiltY, x: cardShiftX, y: cardShiftY, transformStyle: 'preserve-3d' }}
-              className="relative mx-auto w-[300px] sm:w-[360px] h-[180px] sm:h-[216px] rounded-3xl p-5 sm:p-6 shadow-2xl"
+              onMouseEnter={() => setIsFlipped(true)}
+              onMouseLeave={() => setIsFlipped(false)}
+              onClick={() => setIsFlipped((v) => !v)}
+              style={{
+                rotateX: cardTiltX,
+                rotateY: cardTiltY,
+                x: cardShiftX,
+                y: cardShiftY,
+                transformStyle: 'preserve-3d'
+              }}
+              className="relative mx-auto w-[17rem] sm:w-[19rem] h-[27rem] sm:h-[30rem] rounded-[1.75rem] p-4 sm:p-5 cursor-pointer select-none"
             >
-              {/* Card body */}
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-neutral-900 via-zinc-800 to-neutral-900" />
-              {/* Subtle glass highlights */}
-              <div className="absolute inset-0 rounded-3xl bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.12),transparent_45%),radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.07),transparent_55%)]" />
-              {/* Border glow */}
-              <div className="absolute inset-0 rounded-3xl ring-1 ring-white/15" />
-
-              {/* Shine sweep */}
+              {/* 3D flip wrapper */}
               <motion.div
-                className="pointer-events-none absolute -inset-1 rounded-[1.75rem]"
-                initial={{ opacity: 0.4, x: -200 }}
-                animate={{ x: 300 }}
-                transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}
-                style={{ background: 'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.12) 45%, rgba(255,255,255,0.06) 55%, transparent 70%)' }}
-              />
+                animate={{ rotateY: isFlipped ? 180 : 0 }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                className="relative h-full w-full"
+                style={{ transformStyle: 'preserve-3d' }}
+              >
+                {/* Front Face */}
+                <div
+                  className="absolute inset-0 rounded-[1.75rem] shadow-2xl"
+                  style={{ backfaceVisibility: 'hidden' }}
+                >
+                  {/* Card body */}
+                  <div className="absolute inset-0 rounded-[1.75rem] bg-gradient-to-br from-neutral-900 via-zinc-800 to-neutral-900" />
+                  {/* Subtle glass highlights */}
+                  <div className="absolute inset-0 rounded-[1.75rem] bg-[radial-gradient(circle_at_30%_15%,rgba(255,255,255,0.12),transparent_45%),radial-gradient(circle_at_70%_85%,rgba(255,255,255,0.07),transparent_55%)]" />
+                  {/* Border glow */}
+                  <div className="absolute inset-0 rounded-[1.75rem] ring-1 ring-white/15" />
 
-              {/* Content */}
-              <div className="relative h-full w-full flex flex-col justify-between text-white">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-semibold tracking-wider uppercase text-amber-300">Tiger</div>
-                  <div className="h-6 w-9 rounded-md bg-gradient-to-br from-amber-400 to-red-400 opacity-90" />
-                </div>
+                  {/* Vertical shine sweep */}
+                  <motion.div
+                    className="pointer-events-none absolute -inset-[2px] rounded-[1.85rem]"
+                    initial={{ opacity: 0.35, y: -240 }}
+                    animate={{ y: 400 }}
+                    transition={{ repeat: Infinity, duration: 4.5, ease: 'linear' }}
+                    style={{ background: 'linear-gradient(180deg, transparent 25%, rgba(255,255,255,0.14) 45%, rgba(255,255,255,0.07) 60%, transparent 75%)' }}
+                  />
 
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-[11px] opacity-70">
-                    <div className="h-4 w-5 rounded-sm bg-gradient-to-br from-zinc-300 to-white opacity-90 mr-1" />
-                    <span>VIRTUAL • CARD</span>
+                  {/* Content */}
+                  <div className="relative h-full w-full flex flex-col text-white">
+                    <div className="flex items-center justify-between pt-2">
+                      <div className="text-sm font-semibold tracking-wider uppercase text-amber-300">Tiger</div>
+                      <div className="h-7 w-10 rounded-md bg-gradient-to-br from-amber-400 to-red-400 opacity-90" />
+                    </div>
+
+                    <div className="mt-auto mb-3 space-y-2">
+                      <div className="flex items-center gap-2 text-[11px] opacity-70">
+                        <div className="h-4 w-5 rounded-sm bg-gradient-to-br from-zinc-300 to-white opacity-90 mr-1" />
+                        <span>VIRTUAL • CARD</span>
+                      </div>
+                      <div className="font-[600] tracking-[0.35em] text-lg sm:text-xl">5240  1930  4872  1029</div>
+                      <div className="flex items-center justify-between text-[11px] opacity-80">
+                        <span>VALID THRU 12/28</span>
+                        <span className="tracking-widest">VISA</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] pt-1">
+                        <span className="font-medium tracking-widest">ALEXANDER TIGER</span>
+                        <div className="h-6 w-10 rounded bg-gradient-to-br from-sky-400 to-indigo-500 opacity-80" />
+                      </div>
+                    </div>
                   </div>
-                  <div className="font-[600] tracking-[0.25em] text-lg sm:text-xl">5240  1930  4872  1029</div>
-                  <div className="flex items-center justify-between text-[11px] opacity-80">
-                    <span>VALID THRU 12/28</span>
-                    <span className="tracking-widest">VISA</span>
-                  </div>
                 </div>
 
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="font-medium tracking-widest">ALEXANDER TIGER</span>
-                  <div className="h-6 w-10 rounded bg-gradient-to-br from-sky-400 to-indigo-500 opacity-80" />
+                {/* Back Face */}
+                <div
+                  className="absolute inset-0 rounded-[1.75rem] shadow-2xl"
+                  style={{ transform: 'rotateY(180deg)', backfaceVisibility: 'hidden' }}
+                >
+                  {/* Base */}
+                  <div className="absolute inset-0 rounded-[1.75rem] bg-gradient-to-br from-neutral-950 via-zinc-900 to-neutral-800" />
+                  {/* Border */}
+                  <div className="absolute inset-0 rounded-[1.75rem] ring-1 ring-white/10" />
+
+                  {/* Magnetic strip */}
+                  <div className="absolute top-6 left-0 right-0 h-12 bg-gradient-to-b from-zinc-700 to-zinc-900" />
+
+                  {/* Signature + CVV panel */}
+                  <div className="absolute top-24 left-5 right-5 h-14 rounded-md bg-white/85 backdrop-blur px-3 py-2 flex items-center justify-between">
+                    <div className="text-[10px] tracking-widest text-gray-700">AUTHORIZED SIGNATURE</div>
+                    <div className="ml-3 px-2 py-1 rounded bg-gray-200 text-gray-900 text-xs font-semibold tracking-widest">821</div>
+                  </div>
+
+                  {/* Info text */}
+                  <div className="absolute bottom-6 left-5 right-5 text-[10px] text-gray-300 leading-relaxed">
+                    Use of this card is subject to the cardholder agreement. For support, call 1-800-TIGER.
+                  </div>
+
+                  {/* Hologram */}
+                  <div className="absolute bottom-20 right-6 h-10 w-14 rounded-md bg-gradient-to-br from-amber-400 via-pink-400 to-indigo-400 opacity-80" />
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           </motion.div>
 
